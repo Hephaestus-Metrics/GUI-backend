@@ -4,25 +4,23 @@ import dto.ExampleMetric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class ExampleMetricResponseEntity extends ResponseEntity {
 
-    private ExampleMetric exampleMetric;
+    private List<ExampleMetric> list;
     private HttpStatus status;
 
-    public ExampleMetricResponseEntity(HttpStatus status, ExampleMetric exampleMetric) {
+    public ExampleMetricResponseEntity(HttpStatus status, List<ExampleMetric> list) {
         super(status);
         this.status = status;
-        this.exampleMetric = exampleMetric;
+        this.list = list;
     }
 
     public Map<String, Object> toResponseMap() {
         Map<String, Object> response = new HashMap<>();
         response.put("Status", status.value());
-        response.put("Data", toResponseMap(exampleMetric));
+        response.put("Data", list);
         return response;
     }
 
