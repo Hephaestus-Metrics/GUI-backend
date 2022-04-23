@@ -11,6 +11,9 @@ public class PrometheusService {
     private String prometheusAddress;
 
     public String getPrometheusAddress() {
+        if (!prometheusAddress.startsWith("http://") && !prometheusAddress.startsWith("https://")){
+            return "http://" + prometheusAddress;
+        }
         return prometheusAddress;
     }
 }
