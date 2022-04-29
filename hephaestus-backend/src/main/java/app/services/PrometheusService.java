@@ -34,6 +34,10 @@ public class PrometheusService {
     }
 
     public String query(String query) {
+        if (query == null){
+            return "{}";
+        }
+
         return restTemplate.getForObject(
                 getPrometheusAddress() + "/api/v1/query?query={my_query}",
                 String.class,
