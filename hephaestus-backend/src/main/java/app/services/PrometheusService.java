@@ -1,19 +1,48 @@
 package app.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PrometheusService {
 
-    @Value("${prometheus.address}")
-    private String prometheusAddress;
+    private final String prometheusAddress;
+
+    private final RestTemplate restTemplate;
+
+    public PrometheusService(RestTemplateBuilder restTemplateBuilder, @Value("${prometheus.address}") String prometheusAddress) {
+        this.restTemplate = restTemplateBuilder.build();
+        if (!prometheusAddress.startsWith("http://") && !prometheusAddress.startsWith("https://")){
+            this.prometheusAddress = "http://" + prometheusAddress;
+        } else {
+            this.prometheusAddress = prometheusAddress;
+        }
+    }
 
     public String getPrometheusAddress() {
-        if (!prometheusAddress.startsWith("http://") && !prometheusAddress.startsWith("https://")){
-            return "http://" + prometheusAddress;
-        }
         return prometheusAddress;
     }
+
+    public String getLabelsJson() {
+        return restTemplate.getForObject(getPrometheusAddress() + "/api/v1/labels", String.class);
+    }
+
+    public String getLabelValuesJson(String label) {
+        return restTemplate.getForObject(getPrometheusAddress() + "/api/v1/label/{my_label}/values", String.class, label);
+    }
+
+    public String query(String query) {
+        if (query == null){
+            return "{}";
+        }
+
+        return restTemplate.getForObject(
+                getPrometheusAddress() + "/api/v1/query?query={my_query}",
+                String.class,
+                query);
+    }
+
+
 }
