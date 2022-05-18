@@ -1,5 +1,6 @@
 package app.services;
 
+import app.model.Filters;
 import dto.ExampleMetric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,12 @@ public class HephaestusService {
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
 
-    public ResponseEntity saveChoosenMetrics(String[][] body) {
+    public ResponseEntity saveChoosenMetrics(Filters[] body) {
         //todo REFACTOR!!! KS
         StringBuilder stringBuilder = new StringBuilder();
-        for(String[] metric: body) {
-            for(String label: metric) {
-                stringBuilder.append(label + "\t");
+        for(Filters metric: body) {
+            for(String label: metric.getValues().keySet()) {
+                stringBuilder.append(label + ":" + metric.getValues().get(label) + "\t");
             }
             stringBuilder.append("\n");
         }
