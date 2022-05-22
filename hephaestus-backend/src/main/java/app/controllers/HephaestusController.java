@@ -34,7 +34,7 @@ public class HephaestusController {
     public ResponseEntity saveMetrics(@RequestBody Filters[] body) {
         //todo have to refactor!!! KS
         selectedQueries = Arrays.stream(body).collect(Collectors.toList());
-        return this.hephaestusService.saveChoosenMetrics(body);
+        return this.hephaestusService.saveChosenMetrics(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)

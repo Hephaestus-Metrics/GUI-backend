@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import responses.metrics.ExampleMetricResponseEntity;
 import responses.metrics.save.SaveMetricResponseEntity;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class HephaestusService {
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
 
-    public ResponseEntity saveChoosenMetrics(Filters[] body) {
+    public ResponseEntity saveChosenMetrics(Filters[] body) {
         //todo REFACTOR!!! KS
         StringBuilder stringBuilder = new StringBuilder();
         for(Filters metric: body) {
