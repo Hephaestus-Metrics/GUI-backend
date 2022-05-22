@@ -38,12 +38,13 @@ public class HephaestusService {
         ExampleMetricResponseEntity responseEntity = new ExampleMetricResponseEntity(HttpStatus.OK, list);
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
+
     public ResponseEntity saveChosenMetrics(Filters[] body) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"savedMetrics\":[");
         for(Filters metric: body) {
             JSONObject metricAsJSON = new JSONObject(metric.getValues());
-            stringBuilder.append(metricAsJSON).append(',');
+            stringBuilder.append("{\"values\":").append(metricAsJSON).append(",\"isQuery\":").append(metric.getIsQuery()).append("},");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]}");
