@@ -2,7 +2,6 @@ package app.services;
 
 import app.model.Filters;
 import dto.ExampleMetric;
-import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,7 @@ public class HephaestusService {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"savedMetrics\":[");
         for(Filters metric: body) {
-            stringBuilder.append(metric.toSJSONString()).append(",");
+            stringBuilder.append(metric.toJSONString()).append(",");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]}");

@@ -38,7 +38,7 @@ public class Filters {
                 '}';
     }
 
-    public String toSJSONString() {
+    public String toJSONString() {
         return "{" +
                 "\"values\":" + new JSONObject(values) +
                 ",\"isQuery\":" + isQuery +
