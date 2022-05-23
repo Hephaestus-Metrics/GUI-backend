@@ -1,5 +1,7 @@
 package app.model;
 
+import net.minidev.json.JSONObject;
+
 import java.util.Map;
 
 public class Filters {
@@ -31,8 +33,15 @@ public class Filters {
     @Override
     public String toString() {
         return "Filters{" +
-                "values=" + values +
+                "values=" + new JSONObject(values) +
                 ", isQuery=" + isQuery +
+                '}';
+    }
+
+    public String toSJSONString() {
+        return "{" +
+                "\"values\":" + new JSONObject(values) +
+                ",\"isQuery\":" + isQuery +
                 '}';
     }
 

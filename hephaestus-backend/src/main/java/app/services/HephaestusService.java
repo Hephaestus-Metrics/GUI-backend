@@ -43,8 +43,7 @@ public class HephaestusService {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"savedMetrics\":[");
         for(Filters metric: body) {
-            JSONObject metricAsJSON = new JSONObject(metric.getValues());
-            stringBuilder.append("{\"values\":").append(metricAsJSON).append(",\"isQuery\":").append(metric.getIsQuery()).append("},");
+            stringBuilder.append(metric.toSJSONString()).append(",");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]}");
