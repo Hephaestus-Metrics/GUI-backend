@@ -1,6 +1,7 @@
 package app.services;
 
 import app.model.Filters;
+import conf.Configuration;
 import dto.ExampleMetric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class HephaestusService {
         stringBuilder.append("]}");
         String resultString = stringBuilder.toString();
         try {
-            File saveFile = new File(System.getProperty("user.dir") + "/hephaestus-backend/src/main/resources/metrics/Metrics.json");
+            File saveFile = new File(Configuration.VOLUME_PATH);
             saveFile.getParentFile().mkdirs();
             FileWriter output = new FileWriter(saveFile);
             output.write(resultString);

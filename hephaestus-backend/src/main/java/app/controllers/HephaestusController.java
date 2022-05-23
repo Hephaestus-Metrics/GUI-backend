@@ -28,7 +28,6 @@ public class HephaestusController {
     private final HephaestusService hephaestusService;
     private final QueryBuilderService queryBuilderService;
     private final PrometheusService prometheusService;
-    private final String volumePath = System.getProperty("user.dir") + "/hephaestus-backend/src/main/resources/metrics/Metrics.json";
     private List<Filters> selectedQueries;
 
     public HephaestusController(HephaestusService hephaestusService, QueryBuilderService queryBuilderService, PrometheusService prometheusService) {
@@ -36,9 +35,10 @@ public class HephaestusController {
         this.queryBuilderService = queryBuilderService;
         this.prometheusService = prometheusService;
         // read metrics from volume
+        String volumePath = Configuration.VOLUME_PATH;
         try {
             this.selectedQueries = new ArrayList<>();
-            String jsonString = Files.readString(Paths.get(this.volumePath), StandardCharsets.US_ASCII);
+            String jsonString = Files.readString(Paths.get(volumePath), StandardCharsets.US_ASCII);
             JSONArray jsonArr = new JSONObject(jsonString).getJSONArray("savedMetrics");
             ObjectMapper mapper = new ObjectMapper();
             for (int i = 0; i < jsonArr.length(); i++) {
