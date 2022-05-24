@@ -1,5 +1,6 @@
 package app.services;
 
+import conf.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ public class PrometheusService {
 
     private final RestTemplate restTemplate;
 
-    public PrometheusService(RestTemplateBuilder restTemplateBuilder, @Value("${prometheus.address}") String prometheusAddress) {
+    public PrometheusService(RestTemplateBuilder restTemplateBuilder, @Value(Configuration.PROMETHEUS) String prometheusAddress) {
         this.restTemplate = restTemplateBuilder.build();
         if (!prometheusAddress.startsWith("http://") && !prometheusAddress.startsWith("https://")){
             this.prometheusAddress = "http://" + prometheusAddress;

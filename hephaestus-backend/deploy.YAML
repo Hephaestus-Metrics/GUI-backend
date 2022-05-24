@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hepheastus-gui-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hephaestus-gui-backend
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hephaestus-gui
+  template:
+    metadata:
+      labels:
+        app: hephaestus-gui
+    spec:
+      containers:
+      - name: hephaestus-gui
+        image: hephaestus-gui-backend:0.11
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: storage
+            mountPath: /savedMetrics
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: hepheastus-gui-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hephaestus-gui-backend
+  namespace: monitoring
+spec:
+  selector:
+    app: hephaestus-gui
+  type: LoadBalancer
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 8080
+
