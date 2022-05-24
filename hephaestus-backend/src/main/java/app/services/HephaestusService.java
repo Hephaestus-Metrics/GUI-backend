@@ -1,6 +1,7 @@
 package app.services;
 
 import app.model.Filters;
+import conf.Configuration;
 import dto.ExampleMetric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 import responses.metrics.ExampleMetricResponseEntity;
 import responses.metrics.save.SaveMetricResponseEntity;
 
-import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,25 +39,24 @@ public class HephaestusService {
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
 
-    public ResponseEntity saveChoosenMetrics(Filters[] body) {
-        //todo REFACTOR!!! KS
+    public ResponseEntity saveChosenMetrics(Filters[] body) {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{\"savedMetrics\":[");
         for(Filters metric: body) {
-            for(String label: metric.getValues().keySet()) {
-                stringBuilder.append(label + ":" + metric.getValues().get(label) + "\t");
-            }
-            stringBuilder.append("\n");
+            stringBuilder.append(metric.toJSONString()).append(",");
         }
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        stringBuilder.append("]}");
         String resultString = stringBuilder.toString();
         try {
-            System.out.println(System.getProperty("user.dir"));
-            FileWriter output = new FileWriter(System.getProperty("user.dir") + "/hephaestus-backend/src/main/resources/metrics/Metrics.txt");
+            File saveFile = new File(Configuration.VOLUME_PATH);
+            saveFile.getParentFile().mkdirs();
+            FileWriter output = new FileWriter(saveFile);
             output.write(resultString);
             output.close();
         } catch (Exception e) {
             e.getStackTrace();
         }
-
         SaveMetricResponseEntity responseEntity = new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
