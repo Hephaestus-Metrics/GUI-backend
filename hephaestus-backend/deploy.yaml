@@ -28,7 +28,7 @@ spec:
       containers:
         - name: hephaestus-gui
           image: hephaestus-gui:0.11
-          args: ["--prometheus=http://prometheus.monitoring.svc.cluster.local:9090"] 
+          args: ["--prometheus.address=http://prometheus.monitoring.svc.cluster.local:9090"] 
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
