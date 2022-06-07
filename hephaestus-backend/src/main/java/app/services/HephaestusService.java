@@ -1,7 +1,7 @@
 package app.services;
 
 import app.model.Filters;
-import conf.Configuration;
+import app.volume.VolumeManager;
 import dto.ExampleMetric;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import responses.metrics.ExampleMetricResponseEntity;
 import responses.metrics.save.SaveMetricResponseEntity;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,23 +38,7 @@ public class HephaestusService {
     }
 
     public ResponseEntity saveChosenMetrics(Filters[] body) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{\"savedMetrics\":[");
-        for(Filters metric: body) {
-            stringBuilder.append(metric.toJSONString()).append(",");
-        }
-        stringBuilder.deleteCharAt(stringBuilder.length()-1);
-        stringBuilder.append("]}");
-        String resultString = stringBuilder.toString();
-        try {
-            File saveFile = new File(Configuration.VOLUME_PATH);
-            saveFile.getParentFile().mkdirs();
-            FileWriter output = new FileWriter(saveFile);
-            output.write(resultString);
-            output.close();
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
+        VolumeManager.saveMetrics(body);
         SaveMetricResponseEntity responseEntity = new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }

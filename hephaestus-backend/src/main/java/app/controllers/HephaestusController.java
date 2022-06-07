@@ -5,6 +5,7 @@ import app.model.SelectedMetrics;
 import app.services.HephaestusService;
 import app.services.PrometheusService;
 import app.services.QueryBuilderService;
+import app.volume.VolumeManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import conf.Configuration;
 import org.json.JSONArray;
@@ -35,20 +36,9 @@ public class HephaestusController {
         this.queryBuilderService = queryBuilderService;
         this.prometheusService = prometheusService;
         // read metrics from volume
-        String volumePath = Configuration.VOLUME_PATH;
-        try {
-            this.selectedQueries = new ArrayList<>();
-            String jsonString = Files.readString(Paths.get(volumePath), StandardCharsets.US_ASCII);
-            JSONArray jsonArr = new JSONObject(jsonString).getJSONArray("savedMetrics");
-            ObjectMapper mapper = new ObjectMapper();
-            for (int i = 0; i < jsonArr.length(); i++) {
-                String filtersStr = jsonArr.get(i).toString();
-                Filters filters = mapper.readValue(filtersStr, Filters.class);
-                this.selectedQueries.add(filters);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot read volume: " + volumePath);
+        this.selectedQueries = VolumeManager.loadMetrics(false);
+        if (this.selectedQueries.size() == 0){
+            this.selectedQueries = VolumeManager.loadMetrics(true);
         }
     }
 
