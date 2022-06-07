@@ -17,11 +17,9 @@ import java.util.List;
 
 public class VolumeManager {
 
-    @Value("${saved.path}")
-    private final static String savedPath = null;
 
-    @Value("${config.path}")
-    private final static String configPath = null;
+    private static final String savedPath = "/../metrics/savedMetrics/metrics.json";
+    private final static String configPath = "/../metrics/configMetrics/metrics.json";
 
     public static void saveMetrics(Filters[] body){
         StringBuilder stringBuilder = new StringBuilder();
