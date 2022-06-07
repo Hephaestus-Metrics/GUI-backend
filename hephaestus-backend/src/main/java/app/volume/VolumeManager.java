@@ -34,10 +34,12 @@ public class VolumeManager {
     public ResponseEntity saveMetrics(Filters[] body){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"chosenMetrics\":[");
-        for(Filters metric: body) {
-            stringBuilder.append(metric.toJSONString()).append(",");
+        if (body.length > 0) {
+            for (Filters metric : body) {
+                stringBuilder.append(metric.toJSONString()).append(",");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length()-1);
         }
-        stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]}");
         String resultString = stringBuilder.toString();
         try {
@@ -56,7 +58,7 @@ public class VolumeManager {
     /**
      * Loads metrics from volume
      * @param fromConfigMap - whether to load from config map instead of default volume
-     * @return metrics from volume, empty list if exception occured
+     * @return metrics from volume, null if exception occurred
      */
     public List<Filters> loadMetrics(boolean fromConfigMap){
         String volumePath;
@@ -78,6 +80,7 @@ public class VolumeManager {
             }
         } catch (Exception e) {
             System.out.println("Cannot read volume: " + volumePath);
+            return null;
         }
         return selectedQueries;
     }
