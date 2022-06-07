@@ -38,10 +38,4 @@ public class HephaestusService {
         return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
 
-//    public ResponseEntity saveChosenMetrics(Filters[] body) {
-//        VolumeManager.saveMetrics(body);
-//        SaveMetricResponseEntity responseEntity = new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
-//        return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
-//    }
-
 }
