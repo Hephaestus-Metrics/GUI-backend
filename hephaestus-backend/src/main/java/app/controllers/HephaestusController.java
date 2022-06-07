@@ -6,16 +6,11 @@ import app.services.HephaestusService;
 import app.services.PrometheusService;
 import app.services.QueryBuilderService;
 import app.volume.VolumeManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import conf.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,25 +22,29 @@ import java.util.stream.Collectors;
 public class HephaestusController {
 
     private final HephaestusService hephaestusService;
+
+    private final VolumeManager volumeManager;
+
     private final QueryBuilderService queryBuilderService;
     private final PrometheusService prometheusService;
     private List<Filters> selectedQueries;
 
-    public HephaestusController(HephaestusService hephaestusService, QueryBuilderService queryBuilderService, PrometheusService prometheusService) {
+    public HephaestusController(HephaestusService hephaestusService, QueryBuilderService queryBuilderService, PrometheusService prometheusService, VolumeManager volumeManager) {
         this.hephaestusService = hephaestusService;
         this.queryBuilderService = queryBuilderService;
         this.prometheusService = prometheusService;
+        this.volumeManager = volumeManager;
         // read metrics from volume
-        this.selectedQueries = VolumeManager.loadMetrics(false);
+        this.selectedQueries = volumeManager.loadMetrics(false);
         if (this.selectedQueries.size() == 0){
-            this.selectedQueries = VolumeManager.loadMetrics(true);
+            this.selectedQueries = volumeManager.loadMetrics(true);
         }
     }
 
     @RequestMapping(value = "/metrics/save", method = RequestMethod.PUT)
     public ResponseEntity saveMetrics(@RequestBody Filters[] body) {
         selectedQueries = Arrays.stream(body).collect(Collectors.toList());
-        return this.hephaestusService.saveChosenMetrics(body);
+        return this.volumeManager.saveMetrics(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)

@@ -6,6 +6,10 @@ import conf.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import responses.metrics.save.SaveMetricResponseEntity;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,15 +19,19 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class VolumeManager {
 
-    @Value("${saved.path}")
-    private final static String savedPath = null;
+    private final String savedPath;
 
-    @Value("${config.path}")
-    private final static String configPath = null;
+    private final String configPath;
 
-    public static void saveMetrics(Filters[] body){
+    public VolumeManager(@Value("${config.path}") String configPath, @Value("${saved.path}") String savedPath) {
+        this.configPath = configPath;
+        this.savedPath = savedPath;
+    }
+
+    public ResponseEntity saveMetrics(Filters[] body){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"chosenMetrics\":[");
         for(Filters metric: body) {
@@ -41,6 +49,8 @@ public class VolumeManager {
         } catch (Exception e) {
             e.getStackTrace();
         }
+        SaveMetricResponseEntity responseEntity = new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
+        return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
     }
 
     /**
@@ -48,7 +58,7 @@ public class VolumeManager {
      * @param fromConfigMap - whether to load from config map instead of default volume
      * @return metrics from volume, empty list if exception occured
      */
-    public static List<Filters> loadMetrics(boolean fromConfigMap){
+    public List<Filters> loadMetrics(boolean fromConfigMap){
         String volumePath;
         if (fromConfigMap) {
             volumePath = configPath;
