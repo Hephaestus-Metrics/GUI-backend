@@ -5,16 +5,12 @@ import app.model.SelectedMetrics;
 import app.services.HephaestusService;
 import app.services.PrometheusService;
 import app.services.QueryBuilderService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import app.volume.VolumeManager;
 import conf.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,37 +21,33 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = Configuration.GUI_ORIGINS)
 public class HephaestusController {
 
-    private final HephaestusService hephaestusService;
+    //private final HephaestusService hephaestusService;
+    private final VolumeManager volumeManager;
     private final QueryBuilderService queryBuilderService;
     private final PrometheusService prometheusService;
     private List<Filters> selectedQueries;
 
-    public HephaestusController(HephaestusService hephaestusService, QueryBuilderService queryBuilderService, PrometheusService prometheusService) {
-        this.hephaestusService = hephaestusService;
+    public HephaestusController(QueryBuilderService queryBuilderService, PrometheusService prometheusService, VolumeManager volumeManager) {
+        //this.hephaestusService = hephaestusService;
         this.queryBuilderService = queryBuilderService;
         this.prometheusService = prometheusService;
+        this.volumeManager = volumeManager;
         // read metrics from volume
-        String volumePath = Configuration.VOLUME_PATH;
-        try {
+        this.selectedQueries = volumeManager.loadMetrics(false);
+        if (this.selectedQueries == null){
+            // read from config map
+            this.selectedQueries = volumeManager.loadMetrics(true);
+        }
+        // all reads failed
+        if (this.selectedQueries == null){
             this.selectedQueries = new ArrayList<>();
-            String jsonString = Files.readString(Paths.get(volumePath), StandardCharsets.US_ASCII);
-            JSONArray jsonArr = new JSONObject(jsonString).getJSONArray("savedMetrics");
-            ObjectMapper mapper = new ObjectMapper();
-            for (int i = 0; i < jsonArr.length(); i++) {
-                String filtersStr = jsonArr.get(i).toString();
-                Filters filters = mapper.readValue(filtersStr, Filters.class);
-                this.selectedQueries.add(filters);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Cannot read volume: " + volumePath);
         }
     }
 
     @RequestMapping(value = "/metrics/save", method = RequestMethod.PUT)
     public ResponseEntity saveMetrics(@RequestBody Filters[] body) {
         selectedQueries = Arrays.stream(body).collect(Collectors.toList());
-        return this.hephaestusService.saveChosenMetrics(body);
+        return this.volumeManager.saveMetrics(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)
