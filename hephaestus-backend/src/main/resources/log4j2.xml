@@ -13,7 +13,7 @@
         </Console>
         <RollingFile name="RollingFileAppender"
                      fileName="logs/hephaestus-backend.log"
-                     filePattern="logs/hephaestus-backend-%d{dd-MM-yyyy-HH-mm}-%i.log.gz">
+                     filePattern="logs/hephaestus-backend-%d{dd-MM-yyyy}-%i.log.gz">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
@@ -27,7 +27,7 @@
         </RollingFile>
         <RollingFile name="ErrorRollingFileAppender"
                      fileName="logs/error/hephaestus-backend-error.log"
-                     filePattern="logs/error/hephaestus-backend-error-%d{dd-MM-yyyy-hh-mm}-%i.log.gz">
+                     filePattern="logs/error/hephaestus-backend-error-%d{dd-MM-yyyy}-%i.log.gz">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
