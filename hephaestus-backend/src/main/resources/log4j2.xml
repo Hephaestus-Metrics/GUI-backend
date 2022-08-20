@@ -12,8 +12,8 @@
             </PatternLayout>
         </Console>
         <RollingFile name="RollingFileAppender"
-                     fileName="logs/hephaestus-backend.log"
-                     filePattern="logs/hephaestus-backend-%i.log.gz">
+                     fileName="${env:logging.path:-logs}/hephaestus-backend.log"
+                     filePattern="${env:logging.path:-logs}/hephaestus-backend-%i.log.gz">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
@@ -24,8 +24,8 @@
             <DefaultRolloverStrategy max="10" />
         </RollingFile>
         <RollingFile name="ErrorRollingFileAppender"
-                     fileName="logs/error/hephaestus-backend-error.log"
-                     filePattern="logs/error/hephaestus-backend-error-%i.log.gz">
+                     fileName="${env:logging.path:-logs}/error/hephaestus-backend-error.log"
+                     filePattern="${env:logging.path:-logs}/error/hephaestus-backend-error-%i.log.gz">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
