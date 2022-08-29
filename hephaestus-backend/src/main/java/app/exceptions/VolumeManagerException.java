@@ -1,8 +1,7 @@
 package app.exceptions;
 
-public class VolumeManagerException extends RuntimeException{
+import lombok.experimental.StandardException;
 
-    public VolumeManagerException (String message) {
-        super(message);
-    }
+@StandardException
+public class VolumeManagerException extends RuntimeException{
 }

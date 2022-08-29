@@ -1,8 +1,7 @@
 package app.exceptions;
 
-public class PrometheusServiceException extends RuntimeException{
+import lombok.experimental.StandardException;
 
-    public PrometheusServiceException (String message) {
-        super(message);
-    }
+@StandardException
+public class PrometheusServiceException extends RuntimeException{
 }
