@@ -1,11 +1,14 @@
 package app.services;
 
+import app.exceptions.PrometheusServiceException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Log4j2
 public class PrometheusService {
 
     private final String prometheusAddress;
@@ -19,6 +22,7 @@ public class PrometheusService {
         } else {
             this.prometheusAddress = prometheusAddress;
         }
+        log.info("Set prometheus address to {}", prometheusAddress);
     }
 
     public String getPrometheusAddress() {
@@ -26,11 +30,23 @@ public class PrometheusService {
     }
 
     public String getLabelsJson() {
-        return restTemplate.getForObject(getPrometheusAddress() + "/api/v1/labels", String.class);
+        String labelsAddress = getPrometheusAddress() + "/api/v1/labels";
+        try {
+            return restTemplate.getForObject(labelsAddress, String.class);
+        } catch(Exception ex) {
+          throw new PrometheusServiceException(
+                  "Unexpected exception occurred while loading labels: " + ex.getMessage());
+        }
     }
 
     public String getLabelValuesJson(String label) {
-        return restTemplate.getForObject(getPrometheusAddress() + "/api/v1/label/{my_label}/values", String.class, label);
+        try {
+            return restTemplate.getForObject(
+                    getPrometheusAddress() + "/api/v1/label/{my_label}/values", String.class, label);
+        } catch(Exception ex) {
+            throw new PrometheusServiceException(
+                    "Unexpected exception occurred while loading labels' values: " + ex.getMessage());
+        }
     }
 
     public String query(String query) {
@@ -43,6 +59,5 @@ public class PrometheusService {
                 String.class,
                 query);
     }
-
 
 }

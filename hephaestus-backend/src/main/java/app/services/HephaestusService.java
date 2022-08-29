@@ -1,8 +1,7 @@
 package app.services;
 
-import app.model.Filters;
-import app.volume.VolumeManager;
 import dto.ExampleMetric;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Log4j2
 public class HephaestusService {
-
 
     public ResponseEntity getMetrics() {
         //only for testing
