@@ -3,7 +3,6 @@ package app.volume;
 import app.exceptions.VolumeManagerException;
 import app.model.Filters;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import conf.Configuration;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,7 +67,7 @@ public class VolumeManager {
     public List<Filters> loadMetrics() {
         List<Filters> selectedQueries;
         selectedQueries = loadMetrics(false);
-        if (selectedQueries == null){
+        if (selectedQueries != null){
             selectedQueries = loadMetrics(true);
         }
         if (selectedQueries == null){
