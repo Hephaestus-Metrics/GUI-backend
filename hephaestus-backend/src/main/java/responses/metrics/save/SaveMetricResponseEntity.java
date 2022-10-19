@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SaveMetricResponseEntity extends ResponseEntity {
+public class SaveMetricResponseEntity extends ResponseEntity<Void> {
 
     private HttpStatus status;
     private String message;

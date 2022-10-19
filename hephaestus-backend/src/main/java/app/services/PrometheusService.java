@@ -1,6 +1,8 @@
 package app.services;
 
 import app.exceptions.PrometheusServiceException;
+import app.model.RawMetric;
+import app.model.SelectedQuery;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -58,6 +60,13 @@ public class PrometheusService {
                 getPrometheusAddress() + "/api/v1/query?query={my_query}",
                 String.class,
                 query);
+    }
+
+    public RawMetric query(SelectedQuery query) {
+        if (query == null){
+            return null;
+        }
+        return new RawMetric(query.getTag(), query(query.getQueryString()));
     }
 
 }

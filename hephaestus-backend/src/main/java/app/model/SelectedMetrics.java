@@ -1,19 +1,14 @@
 package app.model;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
+@RequiredArgsConstructor
+@Getter
 public class SelectedMetrics {
 
-    //TODO in the future we may add fields to this class if we add new formats for storing metrics (e.g. named queries)
-    private final List<String> simpleMetrics; // the strings are JSON strings returned by Prometheus as a result of querying
-
-    public SelectedMetrics(List<String> simpleMetrics) {
-        this.simpleMetrics = simpleMetrics;
-    }
-
-    public List<String> getSimpleMetrics() {
-        return simpleMetrics;
-    }
-
+    private final List<RawMetric> rawMetrics;
 
 }

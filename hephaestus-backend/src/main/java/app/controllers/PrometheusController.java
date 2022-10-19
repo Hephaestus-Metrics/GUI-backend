@@ -45,7 +45,7 @@ public class PrometheusController {
 
     @RequestMapping(value = "/query/filters", method = RequestMethod.POST, produces = "application/json")
     public String postQuery(@RequestBody Filters filters) {
-        return prometheusService.query(queryBuilderService.filtersToQuery(filters));
+        return prometheusService.query(queryBuilderService.filtersToQuery(filters.getValues()));
     }
 
 }
