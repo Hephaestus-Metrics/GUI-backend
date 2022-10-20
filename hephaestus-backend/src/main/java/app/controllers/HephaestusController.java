@@ -2,8 +2,7 @@ package app.controllers;
 
 import app.model.Filters;
 import app.model.SelectedMetrics;
-import app.services.PrometheusService;
-import app.services.QueryBuilderService;
+import app.services.HephaestusService;
 import conf.Configuration;
 
 import lombok.extern.log4j.Log4j2;
@@ -18,27 +17,25 @@ import java.util.List;
 @Log4j2
 public class HephaestusController {
 
-    private final QueryBuilderService queryBuilderService;
-    private final PrometheusService prometheusService;
+    private final HephaestusService hephaestusService;
 
-    public HephaestusController(QueryBuilderService queryBuilderService, PrometheusService prometheusService) {
-        this.queryBuilderService = queryBuilderService;
-        this.prometheusService = prometheusService;
+    public HephaestusController(HephaestusService hephaestusService) {
+        this.hephaestusService = hephaestusService;
     }
 
     @RequestMapping(value = "/metrics/save", method = RequestMethod.PUT)
     public ResponseEntity saveMetrics(@RequestBody Filters[] body) {
-        return this.prometheusService.saveMetrics(body);
+        return this.hephaestusService.saveMetrics(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)
     public SelectedMetrics getSelected() {
-        return this.prometheusService.getSelectedMetrics();
+        return this.hephaestusService.getSelectedMetrics();
     }
 
     @RequestMapping(value = "/metrics/saved", method = RequestMethod.GET, produces = "application/json")
     public List<Filters> getSaved() {
-        return this.prometheusService.getSavedMetrics();
+        return this.hephaestusService.getSavedMetrics();
     }
 }
 
