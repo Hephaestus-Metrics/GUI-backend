@@ -28,6 +28,7 @@ public class QueryBuilderService {
             sb.append(entry.getValue());
             sb.append("\",");
         }
+        sb.deleteCharAt(sb.length()-1);
         sb.append("}");
         return sb.toString();
     }
