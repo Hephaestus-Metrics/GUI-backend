@@ -16,7 +16,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VolumeManagerTest {
     private static final String CONFIG_PATH = "./test_config";
