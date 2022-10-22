@@ -1,14 +1,8 @@
 package responses.metrics.save;
 
-import dto.ExampleMetric;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import responses.metrics.ExampleMetricResponseEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
