@@ -54,10 +54,16 @@ public class PrometheusService {
             return "{}";
         }
 
-        return restTemplate.getForObject(
-                getPrometheusAddress() + "/api/v1/query?query={my_query}",
-                String.class,
-                query);
+        try {
+            return restTemplate.getForObject(
+                    getPrometheusAddress() + "/api/v1/query?query={my_query}",
+                    String.class,
+                    query);
+        } catch (Exception ex) {
+            throw new PrometheusServiceException(
+                    "Unexpected exception occurred while querying: " + ex.getMessage());
+        }
+
     }
 
 }
