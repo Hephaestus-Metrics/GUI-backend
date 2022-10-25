@@ -1,6 +1,7 @@
 package app.services;
 
 import app.exceptions.PrometheusServiceException;
+import app.providers.QueryProvider;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -49,15 +50,8 @@ public class PrometheusService {
         }
     }
 
-    public String query(String query) {
-        if (query == null){
-            return "{}";
-        }
-
-        return restTemplate.getForObject(
-                getPrometheusAddress() + "/api/v1/query?query={my_query}",
-                String.class,
-                query);
+    public String queryFilters(String query) {
+        return QueryProvider.query(query, getPrometheusAddress(), restTemplate);
     }
 
 }

@@ -1,40 +1,64 @@
 package app.services;
 
-import dto.ExampleMetric;
+import app.model.Filters;
+import app.model.SelectedMetrics;
+import app.providers.QueryProvider;
+import app.volume.VolumeManager;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import responses.metrics.ExampleMetricResponseEntity;
-import responses.metrics.save.SaveMetricResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
 public class HephaestusService {
 
-    public ResponseEntity getMetrics() {
-        //only for testing
-        Map<String, String> map = new HashMap<>();
-        map.put("ThirdLabel", "ThirdValue");
-        map.put("Label2", "LabelValue2");
-        ExampleMetric exampleMetric = new ExampleMetric("MetricName", map);
-        Map<String, String> map2 = new HashMap<>();
-        map2.put("ThirdLabel", "ThirdValue");
-        ExampleMetric exampleMetric2 = new ExampleMetric("MetricName2", map2);
-        Map<String, String> map3 = new HashMap<>();
-        map3.put("Label2", "LabelValue2");
-        ExampleMetric exampleMetric3 = new ExampleMetric("MetricName2", map3);
-        List<ExampleMetric> list = new ArrayList<>();
-        list.add(exampleMetric);
-        list.add(exampleMetric2);
-        list.add(exampleMetric3);
-        ExampleMetricResponseEntity responseEntity = new ExampleMetricResponseEntity(HttpStatus.OK, list);
-        return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
+    private final VolumeManager volumeManager;
+
+    private final QueryBuilderService queryBuilderService;
+
+    private final PrometheusService prometheusService;
+
+    private List<Filters> selectedQueries;
+
+    private final RestTemplate restTemplate;
+
+    public HephaestusService(VolumeManager volumeManager, QueryBuilderService queryBuilderService, PrometheusService prometheusService, RestTemplateBuilder restTemplateBuilder) {
+        this.queryBuilderService = queryBuilderService;
+        this.prometheusService = prometheusService;
+        this.restTemplate = restTemplateBuilder.build();
+        this.volumeManager = volumeManager;
+        this.selectedQueries = volumeManager.loadMetrics();
+    }
+
+    public ResponseEntity saveMetrics(Filters[] metrics) {
+        selectedQueries = Arrays.stream(metrics).collect(Collectors.toList());
+        return this.volumeManager.saveMetrics(metrics);
+    }
+
+    public SelectedMetrics getSelectedMetrics() {
+        if (selectedQueries != null) {
+            List<String> queryResults = selectedQueries.parallelStream()
+                    .map(queryBuilderService::filtersToQuery)
+                    .map(query -> QueryProvider.query(query, prometheusService.getPrometheusAddress(), restTemplate))
+                    .collect(Collectors.toList());
+            log.info("Returning {} selected metrics metrics", queryResults.size());
+            return new SelectedMetrics(queryResults);
+        } else {
+            log.info("No metrics selected - returning an empty list");
+            return new SelectedMetrics(new ArrayList<>());
+        }
+    }
+
+    public List<Filters> getSavedMetrics() {
+        log.info("Returning {} saved metrics", this.selectedQueries.size());
+        return this.selectedQueries;
     }
 
 }
