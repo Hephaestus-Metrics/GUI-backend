@@ -1,14 +1,17 @@
 package app.controllers;
 
-import app.model.Filters;
+import app.model.SelectedFilters;
+import app.model.SelectedQuery;
 import app.services.PrometheusService;
 import app.services.QueryBuilderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import conf.Configuration;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Log4j2
 @RequestMapping("prometheus")
 @CrossOrigin(origins = Configuration.GUI_ORIGINS)
 public class PrometheusController {
@@ -44,8 +47,11 @@ public class PrometheusController {
     }
 
     @RequestMapping(value = "/query/filters", method = RequestMethod.POST, produces = "application/json")
-    public String postQuery(@RequestBody Filters filters) {
-        return prometheusService.query(queryBuilderService.filtersToQuery(filters));
+    public String postQueryFilters(@RequestBody String filtersString) throws JsonProcessingException {
+        log.info("String " + filtersString);
+        SelectedQuery filters = objectMapper.readValue(filtersString, SelectedFilters.class);
+        log.info("Request to perform query for filters: " + filters + ", (query string: " + filters.getQueryString() + ")");
+        return prometheusService.query(filters.getQueryString());
     }
 
 }
