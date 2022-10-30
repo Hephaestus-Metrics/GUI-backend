@@ -19,7 +19,5 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-    - name: Build
+    - name: Build and Test
       run: mvn -B package --file ./hephaestus-backend/pom.xml
-    - name: Test
-      run: mvn test --file ./hephaestus-backend/pom.xml
