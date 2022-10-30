@@ -51,7 +51,12 @@ public class PrometheusService {
     }
 
     public String queryFilters(String query) {
-        return QueryProvider.query(query, getPrometheusAddress(), restTemplate);
+        try {
+            return QueryProvider.query(query, getPrometheusAddress(), restTemplate);
+        } catch (Exception ex) {
+            throw new PrometheusServiceException(
+                    "Unexpected exception occurred while querying: " + ex.getMessage());
+        }
     }
 
 }
