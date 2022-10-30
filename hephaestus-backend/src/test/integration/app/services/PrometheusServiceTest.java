@@ -115,7 +115,7 @@ public class PrometheusServiceTest {
 
         //when
         when(restTemplate.getForObject(prometheusService.getPrometheusAddress() + QUERY_SUFFIX, String.class, PROMETHEUS_QUERY)).thenReturn(PROMETHEUS_VALUE);
-        String queryResult = prometheusService.query(PROMETHEUS_QUERY);
+        String queryResult = prometheusService.queryFilters(PROMETHEUS_QUERY);
 
         //then
         assertEquals(PROMETHEUS_VALUE, queryResult);
@@ -127,7 +127,7 @@ public class PrometheusServiceTest {
         PrometheusService prometheusService = new PrometheusService(new RestTemplateBuilder(), ADDRESS);
 
         //then
-        assertThrows(PrometheusServiceException.class, () -> prometheusService.query(PROMETHEUS_QUERY));
+        assertThrows(PrometheusServiceException.class, () -> prometheusService.queryFilters(PROMETHEUS_QUERY));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class PrometheusServiceTest {
         PrometheusService prometheusService = new PrometheusService(new RestTemplateBuilder(), ADDRESS);
 
         //when
-        String queryResult = prometheusService.query(null);
+        String queryResult = prometheusService.queryFilters(null);
 
         //then
         assertEquals("{}", queryResult);

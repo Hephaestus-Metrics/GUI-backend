@@ -76,7 +76,7 @@ public class PrometheusControllerTest {
 
     @Test
     void postQueryTest() throws Exception {
-        when(prometheusService.query(QUERY)).thenReturn(VALUE);
+        when(prometheusService.queryFilters(QUERY)).thenReturn(VALUE);
 
         mockMvc.perform(post("/prometheus/query")
                         .content(QUERY))
@@ -91,7 +91,7 @@ public class PrometheusControllerTest {
         filters.setValues(new HashMap<>() {{
             put(KEY, VALUE);
         }});
-        when(prometheusService.query(queryBuilderService.filtersToQuery(filters))).thenReturn(VALUE);
+        when(prometheusService.queryFilters(queryBuilderService.filtersToQuery(filters))).thenReturn(VALUE);
 
         mockMvc.perform(post("/prometheus/query/filters")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
