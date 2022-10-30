@@ -109,7 +109,7 @@ public class PrometheusServiceTest {
     }
 
     @Test
-    void queryTest() {
+    void queryFiltersTest() {
         //given
         PrometheusService prometheusService = new PrometheusService(restTemplateBuilder, ADDRESS);
 
