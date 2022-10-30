@@ -130,18 +130,6 @@ public class PrometheusServiceTest {
         assertThrows(PrometheusServiceException.class, () -> prometheusService.queryFilters(PROMETHEUS_QUERY));
     }
 
-    @Test
-    void shouldReturnEmptyIfQueryIsNull() {
-        //given
-        PrometheusService prometheusService = new PrometheusService(new RestTemplateBuilder(), ADDRESS);
-
-        //when
-        String queryResult = prometheusService.queryFilters(null);
-
-        //then
-        assertEquals("{}", queryResult);
-    }
-
     private static Stream<String> validAddressSource() {
         return Stream.of(
                 "http://" + ADDRESS,
