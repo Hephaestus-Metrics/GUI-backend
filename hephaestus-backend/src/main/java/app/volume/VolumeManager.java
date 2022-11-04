@@ -1,7 +1,6 @@
 package app.volume;
 
 import app.exceptions.VolumeManagerException;
-import app.model.SelectedFilters;
 import app.model.SelectedQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,9 +108,7 @@ public class VolumeManager {
     }
 
     private SelectedQuery queryFromString(String queryStr) throws JsonProcessingException {
-        // TODO currently all queries are being read from JSON as simple queries (SelectedFilters)
-        // support for complex queries must be added
-        return mapper.readValue(queryStr, SelectedFilters.class);
+        return mapper.readValue(queryStr, SelectedQuery.class);
     }
 
 }

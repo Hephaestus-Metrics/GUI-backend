@@ -1,6 +1,5 @@
 package app.model;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,17 +17,22 @@ class SelectedQueryDeserializer extends StdDeserializer<SelectedQuery> {
     }
 
     @Override
-    public SelectedQuery deserialize(JsonParser jp, DeserializationContext ctx) throws IOException, JacksonException {
-        // TODO only works with SelectedFilters
+    public SelectedQuery deserialize(JsonParser jp, DeserializationContext ctx) throws IOException {
         JsonNode node = jp.readValueAsTree();
 
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        for (Iterator<Map.Entry<String, JsonNode>> it = node.get("filters").fields(); it.hasNext(); ) {
-            Map.Entry<String, JsonNode> field = it.next();
-            map.put(field.getKey(), field.getValue().asText());
+        if (node.has("filters")) {
+            // it's a set of filters
+            LinkedHashMap<String, String> map = new LinkedHashMap<>();
+            for (Iterator<Map.Entry<String, JsonNode>> it = node.get("filters").fields(); it.hasNext(); ) {
+                Map.Entry<String, JsonNode> field = it.next();
+                map.put(field.getKey(), field.getValue().asText());
+            }
+            return new SelectedFilters(map);
+        } else {
+            // it's a custom query
+            return new SelectedCustomQuery(node.get("tag").asText(), node.get("queryString").asText());
         }
 
-        return new SelectedFilters(map);
     }
 
 }
