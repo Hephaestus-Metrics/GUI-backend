@@ -29,14 +29,12 @@ public class VolumeManager {
 
     private final String configPath;
 
-    public VolumeManager(
-            @Value("${saved.path}") String savedPath,
-            @Value("${config.path}") String configPath) {
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public VolumeManager(@Value("${saved.path}") String savedPath, @Value("${config.path}") String configPath) {
         this.savedPath = savedPath;
         this.configPath = configPath;
     }
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     public SaveMetricResponseEntity saveQueries(List<SelectedQuery> queries){
         log.info("Attempting to save {} metrics", queries.size());
