@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,11 @@ public class HephaestusService {
     private final ObjectMapper objectMapper;
 
     private List<SelectedQuery> selectedQueries;
+
+    @PostConstruct
+    public void loadQueriesFromVolume() {
+        this.selectedQueries = volumeManager.loadQueries();
+    }
 
     public ResponseEntity<Void> saveMetrics(@RequestBody String body) {
         log.info("Save metrics: " + body);
