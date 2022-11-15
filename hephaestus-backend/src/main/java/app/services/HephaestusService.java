@@ -1,6 +1,5 @@
 package app.services;
 
-import app.model.SelectedFilters;
 import app.model.SelectedQuery;
 import app.volume.VolumeManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,10 +44,9 @@ public class HephaestusService {
                 .map(Object::toString)
                 .map(string -> {
                     try {
-                        // TODO only supports Selected Filters, not complex queries
-                        return objectMapper.readValue(string, SelectedFilters.class);
+                        return objectMapper.readValue(string, SelectedQuery.class);
                     } catch (JsonProcessingException e) {
-                        // TODO
+                        // TODO ugly exception in functional pipeline
                         throw new RuntimeException(e);
                     }
                 })
