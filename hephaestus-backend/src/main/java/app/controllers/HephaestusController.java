@@ -20,19 +20,29 @@ public class HephaestusController {
 
     private final HephaestusService hephaestusService;
 
-    @RequestMapping(value = "/metrics/save", method = RequestMethod.PUT)
-    public ResponseEntity<Void> saveMetrics(@RequestBody String body) {
-        return hephaestusService.saveMetrics(body);
+    @RequestMapping(value = "/queries/simple", method = RequestMethod.GET, produces = "application/json")
+    public List<SelectedQuery> getSavedSimple() {
+        return hephaestusService.getSaved(false);
+    }
+
+    @RequestMapping(value = "/queries/custom", method = RequestMethod.GET, produces = "application/json")
+    public List<SelectedQuery> getSavedCustom() {
+        return hephaestusService.getSaved(true);
+    }
+
+    @RequestMapping(value = "/queries/simple", method = RequestMethod.PUT)
+    public ResponseEntity<Void> saveSimple(@RequestBody String body) {
+        return hephaestusService.saveSimpleQueries(body);
+    }
+
+    @RequestMapping(value = "/queries/custom", method = RequestMethod.PUT)
+    public ResponseEntity<Void> saveCustom(@RequestBody String body) {
+        return hephaestusService.saveCustomQueries(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)
     public List<RawQueryResult> getSelected() {
         return hephaestusService.getSelected();
-    }
-
-    @RequestMapping(value = "/metrics/saved", method = RequestMethod.GET, produces = "application/json")
-    public List<SelectedQuery> getSaved() {
-        return hephaestusService.getSaved();
     }
 
 }
