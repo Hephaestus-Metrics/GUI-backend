@@ -9,6 +9,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Objects;
+
 @Service
 @Log4j2
 public class PrometheusService {
@@ -53,20 +55,25 @@ public class PrometheusService {
 
     public String query(String query) {
         if (query == null){
-            return "{}";
+            return null;
         }
-
+        try {
         return restTemplate.getForObject(
                 getPrometheusAddress() + "/api/v1/query?query={my_query}",
                 String.class,
                 query);
+        } catch (Exception ex) {
+            log.warn("Unexpected exception occurred while querying prometheus for query: " + query);
+            return null;
+        }
     }
 
     public RawQueryResult query(SelectedQuery query) {
         if (query == null){
             return null;
         }
-        return new RawQueryResult(query.getTag(), query(query.getQueryString()));
+        String result = query(query.getQueryString());
+        return !Objects.isNull(result) ? new RawQueryResult(query.getTag(), result) : null;
     }
 
 }
