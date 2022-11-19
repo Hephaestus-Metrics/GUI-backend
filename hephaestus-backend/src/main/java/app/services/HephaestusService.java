@@ -75,7 +75,7 @@ public class HephaestusService {
     }
 
     private List<SelectedQuery> getAllSelectedQueries() {
-        return Stream.concat(selectedCustomQueries.stream(), selectedCustomQueries.stream()).collect(Collectors.toList());
+        return Stream.concat(selectedCustomQueries.stream(), selectedSimpleQueries.stream()).collect(Collectors.toList());
     }
 
     public List<RawQueryResult> getSelected() {
