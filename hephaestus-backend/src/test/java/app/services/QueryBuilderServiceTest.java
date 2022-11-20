@@ -1,15 +1,12 @@
 package app.services;
 
-import app.model.Filters;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class QueryBuilderServiceTest {
@@ -35,11 +32,10 @@ public class QueryBuilderServiceTest {
     void emptyFiltersTest() {
         //given
         QueryBuilderService queryBuilderService = new QueryBuilderService();
-        Filters filters = new Filters();
-        filters.setValues(Collections.emptyMap());
+        Map<String, String> emptyFilters = Collections.emptyMap();
 
         //when
-        String query = queryBuilderService.filtersToQuery(filters);
+        String query = queryBuilderService.filtersToQuery(emptyFilters);
 
         //then
         assertNull(query);
@@ -49,26 +45,17 @@ public class QueryBuilderServiceTest {
     void buildQueryFromFiltersTest() {
         //given
         QueryBuilderService queryBuilderService = new QueryBuilderService();
-        Filters filters = new Filters();
-        filters.setValues(new HashMap<>() {{
+        Map<String, String> filters = new HashMap<>() {{
             put(KEY_1, VALUE_1);
             put(KEY_2, VALUE_2);
-        }});
+        }};
 
         //when
         String query = queryBuilderService.filtersToQuery(filters);
 
         //then
-        assertTrue(isValidJson(query));
-    }
-
-    private boolean isValidJson(String query) {
-        try {
-            new JSONObject(query);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+        assertNotNull(query);
+        assertTrue(query.contains(KEY_1 + "=\"" + VALUE_1 + "\""));
+        assertTrue(query.contains(KEY_2 + "=\"" + VALUE_2 + "\""));
     }
 }
