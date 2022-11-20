@@ -46,8 +46,8 @@ public class HephaestusControllerTest {
     }
 
     @Test
-    void saveMetricsTest() throws Exception {
-        mockMvc.perform(put("/hephaestus/metrics/save")
+    void saveSimpleQueriesTest() throws Exception {
+        mockMvc.perform(put("/hephaestus/queries/simple")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
@@ -57,8 +57,26 @@ public class HephaestusControllerTest {
     }
 
     @Test
-    void getSavedMetricsTest() throws Exception {
-        mockMvc.perform(get("/hephaestus/metrics/saved"))
+    void saveCustomQueriesTest() throws Exception {
+        mockMvc.perform(put("/hephaestus/queries/custom")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content("[]"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getSavedSimpleQueriesTest() throws Exception {
+        mockMvc.perform(get("/hephaestus/queries/simple"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getSavedCustomQueriesTest() throws Exception {
+        mockMvc.perform(get("/hephaestus/queries/custom"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
