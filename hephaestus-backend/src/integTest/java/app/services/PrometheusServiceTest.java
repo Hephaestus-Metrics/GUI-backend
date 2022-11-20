@@ -1,6 +1,9 @@
 package app.services;
 
 import app.exceptions.PrometheusServiceException;
+import app.model.SelectedCustomQuery;
+import app.model.SelectedQuery;
+import io.github.hephaestusmetrics.model.queryresults.RawQueryResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +33,7 @@ public class PrometheusServiceTest {
     private static final String LABELS_SUFFIX = "/api/v1/labels";
     private static final String VALUE_SUFFIX = "/api/v1/label/{my_label}/values";
     private static final String QUERY_SUFFIX = "/api/v1/query?query={my_query}";
+    private static final String QUERY_TAG = "QUERY_TAG";
     private static final String PROMETHEUS_LABEL = "Test Prometheus Label";
     private static final String PROMETHEUS_VALUE = "Test Prometheus Value";
     private static final String PROMETHEUS_QUERY = "Test Prometheus Query";
@@ -109,25 +113,31 @@ public class PrometheusServiceTest {
     }
 
     @Test
-    void queryFiltersTest() {
+    void queryStringTest() {
         //given
         PrometheusService prometheusService = new PrometheusService(restTemplateBuilder, ADDRESS);
 
         //when
         when(restTemplate.getForObject(prometheusService.getPrometheusAddress() + QUERY_SUFFIX, String.class, PROMETHEUS_QUERY)).thenReturn(PROMETHEUS_VALUE);
-        String queryResult = prometheusService.queryFilters(PROMETHEUS_QUERY);
+        String queryResult = prometheusService.query(PROMETHEUS_QUERY);
 
         //then
         assertEquals(PROMETHEUS_VALUE, queryResult);
     }
 
     @Test
-    void shouldThrowExceptionWhileQuerying() {
+    void querySelectedQueryTest() {
         //given
-        PrometheusService prometheusService = new PrometheusService(new RestTemplateBuilder(), ADDRESS);
+        PrometheusService prometheusService = new PrometheusService(restTemplateBuilder, ADDRESS);
+        SelectedQuery selectedQuery = new SelectedCustomQuery(QUERY_TAG, PROMETHEUS_QUERY);
+
+        //when
+        when(restTemplate.getForObject(prometheusService.getPrometheusAddress() + QUERY_SUFFIX, String.class, PROMETHEUS_QUERY)).thenReturn(PROMETHEUS_VALUE);
+        RawQueryResult queryResult = prometheusService.query(selectedQuery);
 
         //then
-        assertThrows(PrometheusServiceException.class, () -> prometheusService.queryFilters(PROMETHEUS_QUERY));
+        assertEquals(QUERY_TAG, queryResult.getTag());
+        assertEquals(PROMETHEUS_VALUE, queryResult.getMetric());
     }
 
     private static Stream<String> validAddressSource() {
