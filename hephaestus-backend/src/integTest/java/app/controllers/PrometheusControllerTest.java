@@ -1,6 +1,6 @@
 package app.controllers;
 
-import app.model.Filters;
+import app.model.SelectedFilters;
 import app.services.PrometheusService;
 import app.services.QueryBuilderService;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -76,7 +77,7 @@ public class PrometheusControllerTest {
 
     @Test
     void postQueryTest() throws Exception {
-        when(prometheusService.queryFilters(QUERY)).thenReturn(VALUE);
+        when(prometheusService.query(QUERY)).thenReturn(VALUE);
 
         mockMvc.perform(post("/prometheus/query")
                         .content(QUERY))
@@ -87,17 +88,16 @@ public class PrometheusControllerTest {
 
     @Test
     void postQueryWithFiltersTest() throws Exception {
-        Filters filters = new Filters();
-        filters.setValues(new HashMap<>() {{
+        Map<String, String> filters = new HashMap<>(){{
             put(KEY, VALUE);
-        }});
-        when(prometheusService.queryFilters(queryBuilderService.filtersToQuery(filters))).thenReturn(VALUE);
-
+        }};
+        SelectedFilters selectedFilters = new SelectedFilters(filters);
+        when(prometheusService.query(selectedFilters.getQueryString())).thenReturn(VALUE);
         mockMvc.perform(post("/prometheus/query/filters")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
-                        .content(filters.toJSONString()))
+                        .content("{\"filters\":{\"" + KEY + "\":\"" + VALUE + "\"}}"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(VALUE)));
