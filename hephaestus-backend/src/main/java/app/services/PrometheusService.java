@@ -1,12 +1,15 @@
 package app.services;
 
 import app.exceptions.PrometheusServiceException;
-import app.providers.QueryProvider;
+import app.model.SelectedQuery;
+import io.github.hephaestusmetrics.model.queryresults.RawQueryResult;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @Service
 @Log4j2
@@ -50,8 +53,27 @@ public class PrometheusService {
         }
     }
 
-    public String queryFilters(String query) {
-        return QueryProvider.query(query, getPrometheusAddress(), restTemplate);
+    public String query(String query) {
+        if (query == null){
+            return null;
+        }
+        try {
+        return restTemplate.getForObject(
+                getPrometheusAddress() + "/api/v1/query?query={my_query}",
+                String.class,
+                query);
+        } catch (Exception ex) {
+            log.warn("Unexpected exception occurred while querying prometheus for query: " + query);
+            return null;
+        }
+    }
+
+    public RawQueryResult query(SelectedQuery query) {
+        if (query == null){
+            return null;
+        }
+        String result = query(query.getQueryString());
+        return !Objects.isNull(result) ? new RawQueryResult(query.getTag(), result) : null;
     }
 
 }

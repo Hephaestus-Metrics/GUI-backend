@@ -1,10 +1,10 @@
 package app.controllers;
 
-import app.model.Filters;
-import app.model.SelectedMetrics;
+import app.model.SelectedQuery;
 import app.services.HephaestusService;
 import conf.Configuration;
-
+import io.github.hephaestusmetrics.model.queryresults.RawQueryResult;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,28 +15,36 @@ import java.util.List;
 @RequestMapping("hephaestus")
 @CrossOrigin(origins = Configuration.GUI_ORIGINS)
 @Log4j2
+@RequiredArgsConstructor
 public class HephaestusController {
 
     private final HephaestusService hephaestusService;
 
-    public HephaestusController(HephaestusService hephaestusService) {
-        this.hephaestusService = hephaestusService;
+    @RequestMapping(value = "/queries/simple", method = RequestMethod.GET, produces = "application/json")
+    public List<SelectedQuery> getSavedSimple() {
+        return hephaestusService.getSaved(false);
     }
 
-    @RequestMapping(value = "/metrics/save", method = RequestMethod.PUT)
-    public ResponseEntity saveMetrics(@RequestBody Filters[] body) {
-        return this.hephaestusService.saveMetrics(body);
+    @RequestMapping(value = "/queries/custom", method = RequestMethod.GET, produces = "application/json")
+    public List<SelectedQuery> getSavedCustom() {
+        return hephaestusService.getSaved(true);
+    }
+
+    @RequestMapping(value = "/queries/simple", method = RequestMethod.PUT)
+    public ResponseEntity<Void> saveSimple(@RequestBody String body) {
+        return hephaestusService.saveSimpleQueries(body);
+    }
+
+    @RequestMapping(value = "/queries/custom", method = RequestMethod.PUT)
+    public ResponseEntity<Void> saveCustom(@RequestBody String body) {
+        return hephaestusService.saveCustomQueries(body);
     }
 
     @RequestMapping(value = "/metrics/selected", method = RequestMethod.GET)
-    public SelectedMetrics getSelected() {
-        return this.hephaestusService.getSelectedMetrics();
+    public List<RawQueryResult> getSelected() {
+        return hephaestusService.getSelected();
     }
 
-    @RequestMapping(value = "/metrics/saved", method = RequestMethod.GET, produces = "application/json")
-    public List<Filters> getSaved() {
-        return this.hephaestusService.getSavedMetrics();
-    }
 }
 
 

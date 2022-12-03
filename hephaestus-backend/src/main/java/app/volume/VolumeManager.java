@@ -1,14 +1,14 @@
 package app.volume;
 
 import app.exceptions.VolumeManagerException;
-import app.model.Filters;
+import app.model.SelectedQuery;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import responses.metrics.save.SaveMetricResponseEntity;
 
@@ -28,18 +28,25 @@ public class VolumeManager {
 
     private final String configPath;
 
-    public VolumeManager(@Value("${config.path}") String configPath, @Value("${saved.path}") String savedPath) {
-        this.configPath = configPath;
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public VolumeManager(@Value("${saved.path}") String savedPath, @Value("${config.path}") String configPath) {
         this.savedPath = savedPath;
+        this.configPath = configPath;
     }
 
-    public ResponseEntity<?> saveMetrics(Filters[] body){
-        log.info("Attempting to save {} metrics", body.length);
+    public SaveMetricResponseEntity saveQueries(List<SelectedQuery> queries){
+        log.info("Attempting to save {} metrics", queries.size());
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"chosenMetrics\":[");
-        if (body.length > 0) {
-            for (Filters metric : body) {
-                stringBuilder.append(metric.toJSONString()).append(",");
+        if (queries.size() > 0) {
+            for (SelectedQuery query : queries) {
+                try {
+                    String queryStr = mapper.writeValueAsString(query);
+                    stringBuilder.append(queryStr).append(",");
+                } catch (JsonProcessingException e) {
+                    log.error("Failed to save query " + query + ", skipping...", e);
+                }
             }
             stringBuilder.deleteCharAt(stringBuilder.length()-1);
         }
@@ -47,6 +54,7 @@ public class VolumeManager {
         String resultString = stringBuilder.toString();
         try {
             File saveFile = new File(savedPath);
+            //noinspection ResultOfMethodCallIgnored
             saveFile.getParentFile().mkdirs();
             FileWriter output = new FileWriter(saveFile);
             output.write(resultString);
@@ -55,23 +63,19 @@ public class VolumeManager {
             throw new VolumeManagerException("Unexpected exception occurred while saving metrics: " + e.getMessage());
         }
         log.info("Metrics saved successfully");
-        SaveMetricResponseEntity responseEntity = new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
-        return new ResponseEntity<Object>(responseEntity.toResponseMap(), responseEntity.getStatusCode());
+        return new SaveMetricResponseEntity(HttpStatus.OK, "Successfully saved");
     }
 
     /**
      * Attempts to load metrics from volume
      * @return metrics from volume or empty list
      */
-
-    public List<Filters> loadMetrics() {
-        List<Filters> selectedQueries;
-        selectedQueries = loadMetrics(false);
-        if(selectedQueries != null) {
-            log.info("loaded total of {} metrics at start from config map", selectedQueries.size());
-            return selectedQueries;
+    public List<SelectedQuery> loadQueries() {
+        List<SelectedQuery> selectedQueries;
+        selectedQueries = loadQueries(false);
+        if (selectedQueries == null){
+            selectedQueries = loadQueries(true);
         }
-        selectedQueries = loadMetrics(true);
         if (selectedQueries == null){
             selectedQueries = new ArrayList<>();
         }
@@ -79,18 +83,18 @@ public class VolumeManager {
         return selectedQueries;
     }
 
-    private List<Filters> loadMetrics(boolean fromConfigMap){
+    private List<SelectedQuery> loadQueries(boolean fromConfigMap){
         String volumePath;
         volumePath = fromConfigMap ? configPath : savedPath;
-        List<Filters> selectedQueries = new ArrayList<>();
+        List<SelectedQuery> selectedQueries = new ArrayList<>();
         try {
             String jsonString = Files.readString(Paths.get(volumePath), StandardCharsets.US_ASCII);
+            // TODO still uses org.json
             JSONArray jsonArr = new JSONObject(jsonString).getJSONArray("chosenMetrics");
-            ObjectMapper mapper = new ObjectMapper();
             for (int i = 0; i < jsonArr.length(); i++) {
-                String filtersStr = jsonArr.get(i).toString();
-                Filters filters = mapper.readValue(filtersStr, Filters.class);
-                selectedQueries.add(filters);
+                String queriesStr = jsonArr.get(i).toString();
+                SelectedQuery query = queryFromString(queriesStr);
+                selectedQueries.add(query);
             }
         } catch (Exception e) {
             String source = fromConfigMap ? "config map" : "save file";
@@ -101,6 +105,10 @@ public class VolumeManager {
             return null;
         }
         return selectedQueries;
+    }
+
+    private SelectedQuery queryFromString(String queryStr) throws JsonProcessingException {
+        return mapper.readValue(queryStr, SelectedQuery.class);
     }
 
 }
