@@ -58,7 +58,6 @@ public class HephaestusService {
 
     private <T> List<T> parseQueries(String body, Class<T> cls) {
         log.info("Save metrics: " + body);
-        // TODO still uses org.json
         JSONArray array = new JSONArray(body);
         return IntStream.range(0, array.length())
                 .mapToObj(array::getJSONObject)
@@ -67,7 +66,6 @@ public class HephaestusService {
                     try {
                         return objectMapper.readValue(string, cls);
                     } catch (JsonProcessingException e) {
-                        // TODO ugly exception in functional pipeline
                         throw new RuntimeException(e);
                     }
                 })

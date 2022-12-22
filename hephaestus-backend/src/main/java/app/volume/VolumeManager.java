@@ -89,7 +89,6 @@ public class VolumeManager {
         List<SelectedQuery> selectedQueries = new ArrayList<>();
         try {
             String jsonString = Files.readString(Paths.get(volumePath), StandardCharsets.US_ASCII);
-            // TODO still uses org.json
             JSONArray jsonArr = new JSONObject(jsonString).getJSONArray("chosenMetrics");
             for (int i = 0; i < jsonArr.length(); i++) {
                 String queriesStr = jsonArr.get(i).toString();
